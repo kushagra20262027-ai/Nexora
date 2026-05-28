@@ -432,7 +432,7 @@ const HomePage = ({ setPage }) => {
         filter: "brightness(0.72) contrast(1.12) saturate(1.1)",
       }}
     >
-      <source src="src/assets/hero-bg.mp4" type="video/mp4" />
+      <source src="/hero-bg.mp4" type="video/mp4" />
     </video>
 
     {/* TOP NAVBAR BLEND */}
