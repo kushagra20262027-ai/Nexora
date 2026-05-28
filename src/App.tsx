@@ -33,6 +33,24 @@ const C = {
   gold: "#8a7548", gold2: "#c9b87a", gold3: "#d4c088", gold4: "#f0dfa0",
 };
 
+const useViewport = () => {
+  const getWidth = () => (typeof window === "undefined" ? 1440 : window.innerWidth);
+  const [width, setWidth] = useState(getWidth);
+
+  useEffect(() => {
+    const onResize = () => setWidth(getWidth());
+    window.addEventListener("resize", onResize);
+    return () => window.removeEventListener("resize", onResize);
+  }, []);
+
+  return {
+    width,
+    isPhone: width <= 640,
+    isMobile: width <= 760,
+    isTablet: width <= 1024,
+  };
+};
+
 /* ── SHARED COMPONENTS ───────────────────────────────── */
 const Eyebrow = ({ children, style = {} }) => (
   <div style={{ fontSize: 10, letterSpacing: "0.28em", textTransform: "uppercase", color: C.gold, marginBottom: 18, display: "flex", alignItems: "center", gap: 12, ...style }}>
@@ -127,16 +145,17 @@ const Marquee = () => {
 /* ── NAV ─────────────────────────────────────────────── */
 const Nav = ({ page, setPage, scrollY }) => {
   const scrolled = scrollY > 20;
+  const { isPhone, isMobile, isTablet } = useViewport();
 
   return (
     <div
       style={{
         position: "fixed",
-        top: 24,
+        top: isMobile ? 14 : 24,
         left: "50%",
         transform: "translateX(-50%)",
 
-        width: "calc(100% - 64px)",
+        width: isMobile ? "calc(100% - 24px)" : isTablet ? "calc(100% - 40px)" : "calc(100% - 64px)",
         maxWidth: 1380,
 
         zIndex: 500,
@@ -146,15 +165,15 @@ const Nav = ({ page, setPage, scrollY }) => {
     >
       <nav
         style={{
-          height: 76,
+          minHeight: isPhone ? 64 : 76,
 
-          padding: "0 34px",
+          padding: isPhone ? "12px 14px" : isTablet ? "0 22px" : "0 34px",
 
           display: "flex",
           alignItems: "center",
           justifyContent: "space-between",
 
-          borderRadius: 24,
+          borderRadius: isPhone ? 18 : 24,
 
           background: scrolled
             ? "rgba(10,10,10,0.42)"
@@ -182,7 +201,7 @@ const Nav = ({ page, setPage, scrollY }) => {
             cursor: "pointer",
 
             fontFamily: "Inter, sans-serif",
-            fontSize: 18,
+            fontSize: isPhone ? 16 : 18,
             fontWeight: 600,
 
             letterSpacing: "-0.03em",
@@ -222,7 +241,9 @@ const Nav = ({ page, setPage, scrollY }) => {
           style={{
             display: "flex",
             alignItems: "center",
-            gap: 34,
+            gap: isPhone ? 16 : isTablet ? 18 : 34,
+            flexWrap: "nowrap",
+            justifyContent: "flex-end",
           }}
         >
           {[
@@ -243,10 +264,10 @@ const Nav = ({ page, setPage, scrollY }) => {
                     ? "#ffffff"
                     : "rgba(255,255,255,0.55)",
 
-                fontSize: 13,
+                fontSize: isPhone ? 11 : 13,
                 fontWeight: 500,
 
-                letterSpacing: "0.08em",
+                letterSpacing: isPhone ? "0.04em" : "0.08em",
 
                 transition: "all .25s ease",
 
@@ -290,9 +311,10 @@ const Nav = ({ page, setPage, scrollY }) => {
           <button
             onClick={() => setPage("contact")}
             style={{
-              height: 44,
+              height: isPhone ? 38 : 44,
+              display: isPhone ? "none" : "block",
 
-              padding: "0 22px",
+              padding: isPhone ? "0 14px" : "0 22px",
 
               borderRadius: 999,
 
@@ -303,10 +325,10 @@ const Nav = ({ page, setPage, scrollY }) => {
 
               color: "#fff",
 
-              fontSize: 11,
+              fontSize: isPhone ? 10 : 11,
               fontWeight: 600,
 
-              letterSpacing: "0.14em",
+              letterSpacing: isPhone ? "0.08em" : "0.14em",
               textTransform: "uppercase",
 
               cursor: "pointer",
@@ -338,9 +360,10 @@ const Nav = ({ page, setPage, scrollY }) => {
 /* ── FOOTER ──────────────────────────────────────────── */
 const Footer = ({ setPage }) => {
   const year = 2026;
+  const { isPhone, isTablet } = useViewport();
   return (
-    <footer style={{ background: C.bg, borderTop: `1px solid ${C.border}`, padding: "60px 52px 36px" }}>
-      <div style={{ display: "grid", gridTemplateColumns: "1.6fr 1fr 1fr", gap: 60, marginBottom: 48 }}>
+    <footer style={{ background: C.bg, borderTop: `1px solid ${C.border}`, padding: isPhone ? "48px 20px 30px" : isTablet ? "56px 36px 34px" : "60px 52px 36px" }}>
+      <div style={{ display: "grid", gridTemplateColumns: isPhone ? "1fr" : isTablet ? "1.4fr 1fr 1fr" : "1.6fr 1fr 1fr", gap: isPhone ? 32 : 60, marginBottom: isPhone ? 36 : 48 }}>
         <div>
           <div style={{ fontFamily: "Georgia,serif", fontSize: 17, color: C.text, marginBottom: 14, letterSpacing: "0.04em" }}>NEXORA <span style={{ color: C.gold }}>AI</span></div>
           <p style={{ fontSize: 13, color: C.text5, lineHeight: 1.8, fontWeight: 300, maxWidth: 270 }}>Merging social traffic with elite engineering. Precision AI architecture for the modern web.</p>
@@ -361,7 +384,7 @@ const Footer = ({ setPage }) => {
           ))}
         </div>
       </div>
-      <div style={{ borderTop: `1px solid ${C.border}`, paddingTop: 26, display: "flex", justifyContent: "space-between" }}>
+      <div style={{ borderTop: `1px solid ${C.border}`, paddingTop: 26, display: "flex", justifyContent: "space-between", gap: 16, flexDirection: isPhone ? "column" : "row" }}>
         <span style={{ fontSize: 11, color: C.text5, letterSpacing: "0.1em" }}>© {year} NEXORA AI. ALL RIGHTS RESERVED.</span>
         <span style={{ fontSize: 11, color: C.text5, fontFamily: "Georgia,serif" }}>GEN: V2.0.0</span>
       </div>
@@ -374,6 +397,7 @@ const Footer = ({ setPage }) => {
 ════════════════════════════════════════════════════════ */
 const HomePage = ({ setPage }) => {
   const [m, setM] = useState(false);
+  const { isPhone, isMobile, isTablet } = useViewport();
   useEffect(() => { const t = setTimeout(() => setM(true), 120); return () => clearTimeout(t); }, []);
 
   const anim = (delay) => ({
@@ -407,7 +431,7 @@ const HomePage = ({ setPage }) => {
     display: "flex",
     alignItems: "center",
     justifyContent: "center",
-    padding: "140px 52px 100px",
+    padding: isPhone ? "118px 20px 74px" : isTablet ? "132px 36px 90px" : "140px 52px 100px",
   }}
 >
   {/* VIDEO BACKGROUND */}
@@ -442,7 +466,7 @@ const HomePage = ({ setPage }) => {
         top: 0,
         left: 0,
         right: 0,
-        height: 180,
+        height: isPhone ? 138 : 180,
         background:
           "linear-gradient(to bottom, rgba(4,4,4,0.92), rgba(4,4,4,0))",
         zIndex: 2,
@@ -467,8 +491,8 @@ const HomePage = ({ setPage }) => {
     <div
       style={{
         position: "absolute",
-        width: 700,
-        height: 700,
+        width: isPhone ? 360 : 700,
+        height: isPhone ? 360 : 700,
         borderRadius: "50%",
         background: "rgba(96,165,250,0.12)",
         filter: "blur(120px)",
@@ -482,8 +506,8 @@ const HomePage = ({ setPage }) => {
     <div
       style={{
         position: "absolute",
-        width: 600,
-        height: 600,
+        width: isPhone ? 340 : 600,
+        height: isPhone ? 340 : 600,
         borderRadius: "50%",
         background: "rgba(201,184,122,0.12)",
         filter: "blur(120px)",
@@ -522,8 +546,8 @@ const HomePage = ({ setPage }) => {
         ...anim(0.2),
         display: "inline-flex",
         alignItems: "center",
-        gap: 14,
-        padding: "10px 18px",
+        gap: isPhone ? 10 : 14,
+        padding: isPhone ? "9px 13px" : "10px 18px",
         border: "1px solid rgba(255,255,255,0.08)",
         background: "rgba(255,255,255,0.04)",
         backdropFilter: "blur(14px)",
@@ -543,8 +567,8 @@ const HomePage = ({ setPage }) => {
 
       <span
         style={{
-          fontSize: 11,
-          letterSpacing: "0.24em",
+          fontSize: isPhone ? 9 : 11,
+          letterSpacing: isPhone ? "0.14em" : "0.24em",
           textTransform: "uppercase",
           color: "#d6c089",
           fontWeight: 500,
@@ -559,11 +583,11 @@ const HomePage = ({ setPage }) => {
       style={{
         ...anim(0.45),
         fontFamily: "Georgia, serif",
-        fontSize: "clamp(58px,8vw,108px)",
-        lineHeight: 0.95,
+        fontSize: isPhone ? "clamp(44px,13vw,58px)" : "clamp(58px,8vw,108px)",
+        lineHeight: isPhone ? 1 : 0.95,
         fontWeight: 400,
         color: "#f5f1e8",
-        letterSpacing: "-0.05em",
+        letterSpacing: isPhone ? "-0.035em" : "-0.05em",
         maxWidth: 980,
         margin: "0 auto",
         textShadow: "0 20px 80px rgba(0,0,0,0.45)",
@@ -585,10 +609,10 @@ const HomePage = ({ setPage }) => {
     <p
       style={{
         ...anim(0.7),
-        margin: "34px auto 52px",
+        margin: isPhone ? "28px auto 38px" : "34px auto 52px",
         maxWidth: 680,
-        fontSize: 18,
-        lineHeight: 1.9,
+        fontSize: isPhone ? 15 : 18,
+        lineHeight: isPhone ? 1.75 : 1.9,
         color: "rgba(255,255,255,0.72)",
         fontWeight: 300,
       }}
@@ -604,14 +628,15 @@ const HomePage = ({ setPage }) => {
         ...anim(0.95),
         display: "flex",
         justifyContent: "center",
-        gap: 18,
+        gap: isPhone ? 12 : 18,
         flexWrap: "wrap",
-        marginBottom: 80,
+        marginBottom: isPhone ? 46 : 80,
       }}
     >
       <button
         style={{
-          padding: "16px 34px",
+          padding: isPhone ? "15px 20px" : "16px 34px",
+          width: isPhone ? "100%" : "auto",
           borderRadius: 14,
           border: "none",
           background:
@@ -631,7 +656,8 @@ const HomePage = ({ setPage }) => {
 
       <button
         style={{
-          padding: "16px 34px",
+          padding: isPhone ? "15px 20px" : "16px 34px",
+          width: isPhone ? "100%" : "auto",
           borderRadius: 14,
           background: "rgba(255,255,255,0.05)",
           backdropFilter: "blur(14px)",
@@ -653,7 +679,7 @@ const HomePage = ({ setPage }) => {
     ...anim(1.1),
     display: "flex",
     justifyContent: "center",
-    gap: 24,
+    gap: isPhone ? 12 : 24,
     flexWrap: "wrap",
     marginTop: 40,
   }}
@@ -666,9 +692,9 @@ const HomePage = ({ setPage }) => {
     <div
       key={i}
       style={{
-        minWidth: 220,
-        padding: "22px 26px",
-        borderRadius: 26,
+        minWidth: isPhone ? "100%" : 220,
+        padding: isPhone ? "18px 18px" : "22px 26px",
+        borderRadius: isPhone ? 18 : 26,
         background: "rgba(255,255,255,0.06)",
         border: "1px solid rgba(255,255,255,0.08)",
         backdropFilter: "blur(22px)",
@@ -743,7 +769,7 @@ const HomePage = ({ setPage }) => {
 <section
   style={{
     position: "relative",
-    padding: "140px 64px",
+    padding: isPhone ? "88px 20px" : isTablet ? "112px 36px" : "140px 64px",
     background:
       "radial-gradient(circle at top left, rgba(166,124,58,0.06), transparent 30%), #060606",
     borderTop: `1px solid rgba(255,255,255,0.06)`,
@@ -838,15 +864,16 @@ const HomePage = ({ setPage }) => {
         style={{
           display: "flex",
           justifyContent: "space-between",
-          alignItems: "flex-end",
-          gap: 40,
-          marginBottom: 90,
+          alignItems: isTablet ? "flex-start" : "flex-end",
+          flexDirection: isTablet ? "column" : "row",
+          gap: isTablet ? 24 : 40,
+          marginBottom: isPhone ? 48 : 90,
         }}
       >
         <SectionTitle
           style={{
             margin: 0,
-            fontSize: "clamp(44px,5vw,82px)",
+            fontSize: isPhone ? "clamp(34px,11vw,46px)" : "clamp(44px,5vw,82px)",
             lineHeight: 1.02,
             letterSpacing: "-0.045em",
             maxWidth: 760,
@@ -881,7 +908,7 @@ const HomePage = ({ setPage }) => {
                 color: "rgba(255,255,255,0.45)",
                 fontWeight: 300,
                 margin: 0,
-                textAlign: "right",
+                textAlign: isTablet ? "left" : "right",
               }}
             >
               Every workflow engineered with precision, behavioral
@@ -896,8 +923,8 @@ const HomePage = ({ setPage }) => {
     <div
       style={{
         display: "grid",
-        gridTemplateColumns: "repeat(2,1fr)",
-        gap: 28,
+        gridTemplateColumns: isMobile ? "1fr" : "repeat(2,1fr)",
+        gap: isPhone ? 18 : 28,
       }}
     >
       {methods.map(([num, title, desc], i) => (
@@ -905,8 +932,8 @@ const HomePage = ({ setPage }) => {
           key={i}
           style={{
             position: "relative",
-            padding: "42px",
-            minHeight: 300,
+            padding: isPhone ? "30px 24px" : "42px",
+            minHeight: isPhone ? 260 : 300,
             background:
               "linear-gradient(180deg, rgba(255,255,255,0.04), rgba(255,255,255,0.015))",
             border: "1px solid rgba(255,255,255,0.08)",
@@ -948,7 +975,7 @@ const HomePage = ({ setPage }) => {
               position: "absolute",
               top: 20,
               right: 26,
-              fontSize: 90,
+              fontSize: isPhone ? 70 : 90,
               fontWeight: 600,
               color: "rgba(255,255,255,0.03)",
               letterSpacing: "-0.06em",
@@ -991,7 +1018,7 @@ const HomePage = ({ setPage }) => {
           {/* Title */}
           <h3
             style={{
-              fontSize: 34,
+              fontSize: isPhone ? 28 : 34,
               lineHeight: 1.08,
               marginBottom: 22,
               color: "#F5F5F2",
@@ -1042,7 +1069,7 @@ const HomePage = ({ setPage }) => {
 <section
   style={{
     position: "relative",
-    padding: "140px 64px",
+    padding: isPhone ? "88px 20px" : isTablet ? "112px 36px" : "140px 64px",
     background:
       "radial-gradient(circle at top right, rgba(166,124,58,0.07), transparent 30%), #050505",
     borderTop: "1px solid rgba(255,255,255,0.06)",
@@ -1097,9 +1124,10 @@ const HomePage = ({ setPage }) => {
       style={{
         display: "flex",
         justifyContent: "space-between",
-        alignItems: "flex-end",
-        gap: 60,
-        marginBottom: 90,
+        alignItems: isTablet ? "flex-start" : "flex-end",
+        flexDirection: isTablet ? "column" : "row",
+        gap: isTablet ? 24 : 60,
+        marginBottom: isPhone ? 52 : 90,
       }}
     >
       <div>
@@ -1145,7 +1173,7 @@ const HomePage = ({ setPage }) => {
         <FadeUp delay={0.1}>
           <SectionTitle
             style={{
-              fontSize: "clamp(48px,5vw,84px)",
+              fontSize: isPhone ? "clamp(36px,11vw,48px)" : "clamp(48px,5vw,84px)",
               lineHeight: 1.02,
               letterSpacing: "-0.05em",
               margin: 0,
@@ -1182,7 +1210,7 @@ const HomePage = ({ setPage }) => {
               color: "rgba(255,255,255,0.46)",
               lineHeight: 1.9,
               fontWeight: 300,
-              textAlign: "right",
+              textAlign: isTablet ? "left" : "right",
               margin: 0,
             }}
           >
@@ -1197,8 +1225,8 @@ const HomePage = ({ setPage }) => {
     <div
       style={{
         display: "grid",
-        gridTemplateColumns: "repeat(3,1fr)",
-        gap: 30,
+        gridTemplateColumns: isTablet ? "1fr" : "repeat(3,1fr)",
+        gap: isPhone ? 18 : 30,
       }}
     >
       {tiers.map((t, i) => (
@@ -1206,8 +1234,8 @@ const HomePage = ({ setPage }) => {
           key={i}
           style={{
             position: "relative",
-            padding: "46px 38px",
-            minHeight: 620,
+            padding: isPhone ? "34px 24px" : "46px 38px",
+            minHeight: isPhone ? 0 : isTablet ? 520 : 620,
             display: "flex",
             flexDirection: "column",
             justifyContent: "space-between",
@@ -1258,8 +1286,8 @@ const HomePage = ({ setPage }) => {
             <div
               style={{
                 position: "absolute",
-                top: 24,
-                right: 24,
+                top: isPhone ? 18 : 24,
+                right: isPhone ? 18 : 24,
                 padding: "8px 14px",
                 border: "1px solid rgba(166,124,58,0.35)",
                 background: "rgba(166,124,58,0.08)",
@@ -1307,7 +1335,7 @@ const HomePage = ({ setPage }) => {
             {/* Tier Name */}
             <h3
               style={{
-                fontSize: 40,
+                fontSize: isPhone ? 31 : 40,
                 lineHeight: 1,
                 color: "#F6F3EE",
                 marginBottom: 20,
@@ -1330,7 +1358,7 @@ const HomePage = ({ setPage }) => {
             >
               <span
                 style={{
-                  fontSize: 54,
+                  fontSize: isPhone ? 38 : 54,
                   fontFamily: "Georgia, serif",
                   color: "#D8BE86",
                   lineHeight: 1,
@@ -1528,13 +1556,14 @@ const TierCard = ({ tier, i, setPage }) => {
 
 const CtaBanner = ({ setPage }) => {
   const [r, v] = useInView(.2);
+  const { isPhone, isTablet } = useViewport();
 
   return (
     <section
       ref={r}
       style={{
         position: "relative",
-        padding: "170px 52px",
+        padding: isPhone ? "96px 20px" : isTablet ? "126px 36px" : "170px 52px",
         background:
           "radial-gradient(circle at top, rgba(166,124,58,0.08), transparent 28%), #050505",
         borderTop: `1px solid rgba(255,255,255,0.06)`,
@@ -1548,8 +1577,8 @@ const CtaBanner = ({ setPage }) => {
           top: -250,
           left: "50%",
           transform: "translateX(-50%)",
-          width: 900,
-          height: 900,
+          width: isPhone ? 460 : 900,
+          height: isPhone ? 460 : 900,
           borderRadius: "50%",
           background: "rgba(166,124,58,0.08)",
           filter: "blur(140px)",
@@ -1628,13 +1657,13 @@ const CtaBanner = ({ setPage }) => {
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
-            gap: 16,
+              gap: isPhone ? 10 : 16,
             marginBottom: 34,
           }}
         >
           <div
             style={{
-              width: 42,
+              width: isPhone ? 28 : 42,
               height: 1,
               background:
                 "linear-gradient(to right, transparent, rgba(166,124,58,0.85))",
@@ -1643,8 +1672,8 @@ const CtaBanner = ({ setPage }) => {
 
           <span
             style={{
-              fontSize: 11,
-              letterSpacing: "0.28em",
+              fontSize: isPhone ? 9 : 11,
+              letterSpacing: isPhone ? "0.16em" : "0.28em",
               textTransform: "uppercase",
               color: "#A67C3A",
             }}
@@ -1654,7 +1683,7 @@ const CtaBanner = ({ setPage }) => {
 
           <div
             style={{
-              width: 42,
+              width: isPhone ? 28 : 42,
               height: 1,
               background:
                 "linear-gradient(to left, transparent, rgba(166,124,58,0.85))",
@@ -1666,13 +1695,13 @@ const CtaBanner = ({ setPage }) => {
         <h2
           style={{
             fontFamily: "Georgia, serif",
-            fontSize: "clamp(46px,6vw,92px)",
+            fontSize: isPhone ? "clamp(36px,11vw,52px)" : "clamp(46px,6vw,92px)",
             fontWeight: 400,
             color: "#F5F2EC",
             maxWidth: 980,
-            margin: "0 auto 28px",
+            margin: isPhone ? "0 auto 22px" : "0 auto 28px",
             lineHeight: 1,
-            letterSpacing: "-0.05em",
+            letterSpacing: isPhone ? "-0.035em" : "-0.05em",
           }}
         >
           Ready to Evolve Your
@@ -1693,11 +1722,11 @@ const CtaBanner = ({ setPage }) => {
         {/* Description */}
         <p
           style={{
-            fontSize: 16,
+            fontSize: isPhone ? 14 : 16,
             color: "rgba(255,255,255,0.48)",
             maxWidth: 620,
-            margin: "0 auto 60px",
-            lineHeight: 2,
+            margin: isPhone ? "0 auto 42px" : "0 auto 60px",
+            lineHeight: isPhone ? 1.8 : 2,
             fontWeight: 300,
             letterSpacing: "0.01em",
           }}
@@ -1719,7 +1748,8 @@ const CtaBanner = ({ setPage }) => {
           <button
             onClick={() => setPage("contact")}
             style={{
-              padding: "18px 34px",
+              padding: isPhone ? "16px 20px" : "18px 34px",
+              width: isPhone ? "100%" : "auto",
               background:
                 "linear-gradient(135deg, #D5B47A 0%, #8E6730 100%)",
               border: "none",
@@ -1749,7 +1779,8 @@ const CtaBanner = ({ setPage }) => {
           <button
             onClick={() => setPage("about")}
             style={{
-              padding: "18px 34px",
+              padding: isPhone ? "16px 20px" : "18px 34px",
+              width: isPhone ? "100%" : "auto",
               background: "rgba(255,255,255,0.03)",
               border: "1px solid rgba(255,255,255,0.1)",
               backdropFilter: "blur(12px)",
@@ -1828,6 +1859,7 @@ const CtaBanner = ({ setPage }) => {
    PAGE: ABOUT
 ════════════════════════════════════════════════════════ */
 const AboutPage = ({ setPage }) => {
+  const { isPhone, isMobile, isTablet } = useViewport();
   const pillars = [
     ["01", "Precision", "Every interaction is engineered with obsessive attention to speed, responsiveness, and conversion psychology."],
     ["02", "Scale", "Systems built to withstand exponential attention spikes without compromising elegance or performance."],
@@ -1866,7 +1898,7 @@ const AboutPage = ({ setPage }) => {
         style={{
           minHeight: "100vh",
           position: "relative",
-          padding: "180px 60px 120px",
+          padding: isPhone ? "132px 20px 82px" : isTablet ? "154px 36px 100px" : "180px 60px 120px",
           borderBottom: `1px solid ${C.border}`,
           overflow: "hidden",
           background:
@@ -1916,8 +1948,8 @@ const AboutPage = ({ setPage }) => {
         <div
           style={{
             position: "absolute",
-            width: 620,
-            height: 620,
+            width: isPhone ? 360 : 620,
+            height: isPhone ? 360 : 620,
             borderRadius: "50%",
             background: "rgba(138,117,72,0.10)",
             filter: "blur(120px)",
@@ -1940,8 +1972,8 @@ const AboutPage = ({ setPage }) => {
               style={{
                 display: "inline-flex",
                 alignItems: "center",
-                gap: 14,
-                padding: "12px 20px",
+                gap: isPhone ? 10 : 14,
+                padding: isPhone ? "10px 14px" : "12px 20px",
                 border: `1px solid ${C.border}`,
                 background: "rgba(255,255,255,0.02)",
                 backdropFilter: "blur(18px)",
@@ -1959,8 +1991,8 @@ const AboutPage = ({ setPage }) => {
               />
               <span
                 style={{
-                  fontSize: 10,
-                  letterSpacing: "0.24em",
+                  fontSize: isPhone ? 9 : 10,
+                  letterSpacing: isPhone ? "0.14em" : "0.24em",
                   textTransform: "uppercase",
                   color: C.gold2,
                 }}
@@ -1974,12 +2006,12 @@ const AboutPage = ({ setPage }) => {
             <h1
               style={{
                 fontFamily: "Georgia,serif",
-                fontSize: "clamp(60px,8vw,118px)",
-                lineHeight: 0.96,
+                fontSize: isPhone ? "clamp(44px,13vw,62px)" : "clamp(60px,8vw,118px)",
+                lineHeight: isPhone ? 1 : 0.96,
                 fontWeight: 400,
                 color: C.text,
                 maxWidth: 980,
-                letterSpacing: "-0.05em",
+                letterSpacing: isPhone ? "-0.035em" : "-0.05em",
                 marginBottom: 34,
               }}
             >
@@ -2001,7 +2033,7 @@ const AboutPage = ({ setPage }) => {
           <FadeUp delay={0.22}>
             <p
               style={{
-                fontSize: 17,
+                fontSize: isPhone ? 15 : 17,
                 color: C.text4,
                 maxWidth: 620,
                 lineHeight: 1.95,
@@ -2020,7 +2052,7 @@ const AboutPage = ({ setPage }) => {
             <div
               style={{
                 display: "grid",
-                gridTemplateColumns: "repeat(3,1fr)",
+                gridTemplateColumns: isPhone ? "1fr" : "repeat(3,1fr)",
                 maxWidth: 850,
                 border: `1px solid ${C.border}`,
                 background: "rgba(255,255,255,0.015)",
@@ -2035,9 +2067,11 @@ const AboutPage = ({ setPage }) => {
                 <div
                   key={i}
                   style={{
-                    padding: "34px 30px",
+                    padding: isPhone ? "24px 22px" : "34px 30px",
                     borderRight:
-                      i !== 2 ? `1px solid ${C.border}` : "none",
+                      !isPhone && i !== 2 ? `1px solid ${C.border}` : "none",
+                    borderBottom:
+                      isPhone && i !== 2 ? `1px solid ${C.border}` : "none",
                     position: "relative",
                     overflow: "hidden",
                   }}
@@ -2093,7 +2127,7 @@ const AboutPage = ({ setPage }) => {
 
       <section
         style={{
-          padding: "140px 60px",
+          padding: isPhone ? "88px 20px" : isTablet ? "112px 36px" : "140px 60px",
           background: C.bg2,
           borderBottom: `1px solid ${C.border}`,
           position: "relative",
@@ -2112,8 +2146,8 @@ const AboutPage = ({ setPage }) => {
         <div
           style={{
             display: "grid",
-            gridTemplateColumns: "1fr 1fr",
-            gap: 110,
+            gridTemplateColumns: isTablet ? "1fr" : "1fr 1fr",
+            gap: isTablet ? 56 : 110,
             alignItems: "center",
             position: "relative",
             zIndex: 1,
@@ -2162,7 +2196,7 @@ const AboutPage = ({ setPage }) => {
             <div
               style={{
                 display: "grid",
-                gridTemplateColumns: "1fr 1fr",
+                gridTemplateColumns: isPhone ? "1fr" : "1fr 1fr",
                 border: `1px solid ${C.border}`,
                 background: "rgba(255,255,255,0.02)",
                 backdropFilter: "blur(16px)",
@@ -2172,11 +2206,11 @@ const AboutPage = ({ setPage }) => {
                 <div
                   key={i}
                   style={{
-                    padding: "42px 34px",
+                    padding: isPhone ? "30px 24px" : "42px 34px",
                     borderRight:
-                      i % 2 === 0 ? `1px solid ${C.border}` : "none",
+                      !isPhone && i % 2 === 0 ? `1px solid ${C.border}` : "none",
                     borderBottom:
-                      i < 2 ? `1px solid ${C.border}` : "none",
+                      isPhone ? (i < values.length - 1 ? `1px solid ${C.border}` : "none") : (i < 2 ? `1px solid ${C.border}` : "none"),
                     transition: "all .35s ease",
                     cursor: "default",
                   }}
@@ -2230,7 +2264,7 @@ const AboutPage = ({ setPage }) => {
 
       <section
         style={{
-          padding: "140px 60px",
+          padding: isPhone ? "88px 20px" : isTablet ? "112px 36px" : "140px 60px",
           background: C.bg,
           borderBottom: `1px solid ${C.border}`,
           position: "relative",
@@ -2251,15 +2285,15 @@ const AboutPage = ({ setPage }) => {
         <div
           style={{
             display: "grid",
-            gridTemplateColumns: "repeat(4,1fr)",
-            gap: 24,
+            gridTemplateColumns: isPhone ? "1fr" : isTablet ? "repeat(2,1fr)" : "repeat(4,1fr)",
+            gap: isPhone ? 18 : 24,
           }}
         >
           {pillars.map(([num, title, desc], i) => (
             <div
               key={i}
               style={{
-                padding: "46px 36px",
+                padding: isPhone ? "32px 24px" : "46px 36px",
                 background: "rgba(255,255,255,0.02)",
                 border: `1px solid ${C.border}`,
                 backdropFilter: "blur(16px)",
@@ -2321,7 +2355,7 @@ const AboutPage = ({ setPage }) => {
 
       <section
         style={{
-          padding: "140px 60px",
+          padding: isPhone ? "88px 20px" : isTablet ? "112px 36px" : "140px 60px",
           background: C.bg2,
           borderBottom: `1px solid ${C.border}`,
           position: "relative",
@@ -2342,15 +2376,15 @@ const AboutPage = ({ setPage }) => {
         <div
           style={{
             display: "grid",
-            gridTemplateColumns: "1fr 1fr",
-            gap: 28,
+            gridTemplateColumns: isMobile ? "1fr" : "1fr 1fr",
+            gap: isPhone ? 18 : 28,
           }}
         >
           {founders.map((f, i) => (
             <div
               key={i}
               style={{
-                padding: "60px 54px",
+                padding: isPhone ? "36px 24px" : "60px 54px",
                 border: `1px solid ${C.border}`,
                 background: "rgba(255,255,255,0.02)",
                 backdropFilter: "blur(18px)",
@@ -2459,6 +2493,7 @@ const AboutPage = ({ setPage }) => {
 ════════════════════════════════════════════════════════ */
 const ContactPage = () => {
   const [m, setM] = useState(false);
+  const { isPhone, isTablet } = useViewport();
 
   useEffect(() => {
     const t = setTimeout(() => setM(true), 100);
@@ -2569,7 +2604,7 @@ const ContactPage = () => {
       <section
         style={{
           minHeight: "82vh",
-          padding: "150px 52px 90px",
+          padding: isPhone ? "126px 20px 76px" : isTablet ? "140px 36px 86px" : "150px 52px 90px",
           position: "relative",
           overflow: "hidden",
           borderBottom: `1px solid ${C.border}`,
@@ -2585,7 +2620,7 @@ const ContactPage = () => {
             top: "48%",
             left: "50%",
             transform: "translate(-50%,-50%)",
-            fontSize: "18vw",
+            fontSize: isPhone ? "23vw" : "18vw",
             fontWeight: 700,
             letterSpacing: "-0.08em",
             color: "rgba(255,255,255,0.025)",
@@ -2627,11 +2662,11 @@ const ContactPage = () => {
             style={{
               ...anim(0.25),
               fontFamily: "Georgia,serif",
-              fontSize: "clamp(52px,7vw,108px)",
+              fontSize: isPhone ? "clamp(40px,12vw,56px)" : "clamp(52px,7vw,108px)",
               lineHeight: 1.02,
               fontWeight: 400,
               color: C.text,
-              letterSpacing: "-0.045em",
+              letterSpacing: isPhone ? "-0.032em" : "-0.045em",
               maxWidth: 920,
               marginBottom: 28,
             }}
@@ -2651,7 +2686,7 @@ const ContactPage = () => {
           <p
             style={{
               ...anim(0.45),
-              fontSize: 16,
+              fontSize: isPhone ? 15 : 16,
               color: C.text4,
               lineHeight: 1.9,
               fontWeight: 300,
@@ -2669,7 +2704,7 @@ const ContactPage = () => {
             style={{
               ...anim(0.7),
               display: "grid",
-              gridTemplateColumns: "repeat(3,1fr)",
+              gridTemplateColumns: isPhone ? "1fr" : "repeat(3,1fr)",
               maxWidth: 760,
               border: `1px solid ${C.border}`,
               background: "rgba(255,255,255,0.015)",
@@ -2684,9 +2719,13 @@ const ContactPage = () => {
               <div
                 key={i}
                 style={{
-                  padding: "28px 34px",
+                  padding: isPhone ? "22px 20px" : "28px 34px",
                   borderRight:
-                    i < 2
+                    !isPhone && i < 2
+                      ? `1px solid ${C.border}`
+                      : "none",
+                  borderBottom:
+                    isPhone && i < 2
                       ? `1px solid ${C.border}`
                       : "none",
                   textAlign: "center",
@@ -2722,7 +2761,7 @@ const ContactPage = () => {
       {/* BOOKING */}
 <section
   style={{
-    padding: "140px 52px",
+    padding: isPhone ? "88px 20px" : isTablet ? "112px 36px" : "140px 52px",
     background: "#050505",
     position: "relative",
     overflow: "hidden",
@@ -2766,8 +2805,8 @@ const ContactPage = () => {
       maxWidth: 1380,
       margin: "0 auto",
       display: "grid",
-      gridTemplateColumns: "1.1fr .9fr",
-      gap: 80,
+      gridTemplateColumns: isTablet ? "1fr" : "1.1fr .9fr",
+      gap: isPhone ? 42 : isTablet ? 56 : 80,
       alignItems: "start",
     }}
   >
@@ -2790,7 +2829,7 @@ const ContactPage = () => {
       <h2
         style={{
           fontFamily: "Georgia,serif",
-          fontSize: "clamp(48px,5vw,84px)",
+          fontSize: isPhone ? "clamp(36px,11vw,48px)" : "clamp(48px,5vw,84px)",
           fontWeight: 400,
           lineHeight: 1.02,
           letterSpacing: "-0.045em",
@@ -2814,11 +2853,11 @@ const ContactPage = () => {
       <p
         style={{
           maxWidth: 520,
-          fontSize: 15,
+          fontSize: isPhone ? 14 : 15,
           lineHeight: 1.95,
           color: C.text4,
           fontWeight: 300,
-          marginBottom: 70,
+          marginBottom: isPhone ? 40 : 70,
         }}
       >
         A focused strategic session with Nexora's engineering team —
@@ -2830,8 +2869,8 @@ const ContactPage = () => {
       <div
         style={{
           display: "grid",
-          gridTemplateColumns: "repeat(3,1fr)",
-          gap: 18,
+          gridTemplateColumns: isPhone ? "1fr" : "repeat(3,1fr)",
+          gap: isPhone ? 12 : 18,
         }}
       >
         {[
@@ -2842,7 +2881,7 @@ const ContactPage = () => {
           <div
             key={i}
             style={{
-              padding: "28px 26px",
+              padding: isPhone ? "22px 20px" : "28px 26px",
               background: "rgba(255,255,255,0.02)",
               border: `1px solid rgba(255,255,255,0.05)`,
               backdropFilter: "blur(14px)",
@@ -2877,7 +2916,7 @@ const ContactPage = () => {
     {/* RIGHT PANEL */}
     <div
       style={{
-        padding: "46px",
+        padding: isPhone ? "32px 22px" : "46px",
         background: "rgba(255,255,255,0.03)",
         border: "1px solid rgba(255,255,255,0.06)",
         backdropFilter: "blur(20px)",
@@ -2890,8 +2929,8 @@ const ContactPage = () => {
         style={{
           position: "absolute",
           top: 0,
-          left: 46,
-          right: 46,
+          left: isPhone ? 22 : 46,
+          right: isPhone ? 22 : 46,
           height: 1,
           background:
             "linear-gradient(to right, transparent, rgba(191,161,97,0.8), transparent)",
@@ -2913,7 +2952,7 @@ const ContactPage = () => {
       <h3
         style={{
           fontFamily: "Georgia,serif",
-          fontSize: 36,
+          fontSize: isPhone ? 30 : 36,
           fontWeight: 400,
           color: C.text,
           lineHeight: 1.12,
@@ -2982,6 +3021,7 @@ export default function App() {
   const handleSetPage = useCallback((p) => {
     setPage(p);
     if (containerRef.current) containerRef.current.scrollTo({ top: 0, behavior: "smooth" });
+    window.scrollTo({ top: 0, behavior: "smooth" });
   }, []);
 
   const handleScroll = useCallback((e) => setScrollY(e.target.scrollTop), []);
@@ -2991,8 +3031,9 @@ return (
     ref={containerRef}
     onScroll={handleScroll}
     style={{
-      width: "100vw",
-      minWidth: "100vw",
+      width: "100%",
+      minWidth: 0,
+      height: "100vh",
       minHeight: "100vh",
       background: "#040404",
       color: C.text,
